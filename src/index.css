@@ -711,6 +711,9 @@ body {
   border-bottom-color: var(--primary-blue);
   font-weight: 600;
   background-color: rgba(90, 102, 255, 0.04);
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 /* Inline Add Tab Editor & Add Tab Button */

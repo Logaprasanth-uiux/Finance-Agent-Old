@@ -21,7 +21,9 @@ class SchemaService {
 
   /**
    * Returns workspace tabs dynamically parsed from JSON.
-   * Standard metadata objects with a Section generate their own Tab, using Section as Name.
+   * Standard metadata objects with a Section generate their own Tab, using:
+   * - Section as the internal unique ID
+   * - Description as the visible tab title Name
    * Elements without a Section are grouped under a single dedicated "Schema" tab.
    */
   getWorkspaceTabs(): Tab[] {
@@ -32,7 +34,7 @@ class SchemaService {
       if (item.Section) {
         tabs.push({
           id: item.Section, // Use Section as the unique internal identifier
-          name: item.Section // Use Section as the visible tab title
+          name: item.Description || item.Section // Use Description as the visible tab title
         });
       } else {
         hasSchemaConfig = true;
