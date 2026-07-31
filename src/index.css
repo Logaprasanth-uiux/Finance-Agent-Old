@@ -1391,3 +1391,241 @@ body {
 .container-title-btn.cancel:hover {
   background-color: rgba(239, 68, 68, 0.1);
 }
+
+/* Field Card Styling */
+.field-card-wrapper {
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.field-card-wrapper:hover {
+  box-shadow: 0px 4px 12px rgba(90, 102, 255, 0.03);
+  border-color: rgba(90, 102, 255, 0.2);
+}
+
+.field-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #FAFBFC;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.2s;
+}
+
+.field-card-wrapper.expanded .field-card-header {
+  border-bottom-color: var(--border);
+  background-color: var(--white);
+}
+
+.field-card-header:hover {
+  background-color: #F4F5F8;
+}
+
+.field-card-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8F9BB3;
+}
+
+.field-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+.field-card-body {
+  padding: 1rem;
+  background-color: var(--white);
+}
+
+/* Recursive JSON Node Outline Tree Styling */
+.json-tree-node {
+  margin: 0.35rem 0;
+}
+
+.json-tree-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  user-select: none;
+  width: max-content;
+}
+
+.json-tree-header:hover {
+  background-color: rgba(90, 102, 255, 0.04);
+}
+
+.json-tree-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8F9BB3;
+}
+
+.json-tree-label {
+  font-weight: 600;
+  color: var(--primary-text);
+}
+
+.json-tree-info {
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  background-color: var(--app-bg);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.json-tree-children {
+  margin-left: 1.25rem;
+  padding-left: 0.75rem;
+  border-left: 1px dashed var(--border);
+  animation: tabFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.json-tree-children-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Primitives list columns formatting */
+.json-primitive-row {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  position: relative;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.json-primitive-row:hover {
+  background-color: rgba(90, 102, 255, 0.02);
+}
+
+.json-primitive-label {
+  font-weight: 600;
+  color: var(--primary-text);
+}
+
+.json-primitive-value-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+}
+
+.json-primitive-value {
+  font-size: 0.88rem;
+  color: var(--secondary-text);
+  background-color: var(--app-bg);
+  padding: 0.2rem 0.6rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+}
+
+.json-primitive-edit-pencil-btn {
+  opacity: 0;
+  visibility: hidden;
+  color: #8F9BB3;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.json-primitive-row:hover .json-primitive-edit-pencil-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.json-primitive-edit-pencil-btn:hover {
+  color: var(--primary-blue);
+  background-color: rgba(90, 102, 255, 0.08);
+}
+
+/* Primitives editing inputs formatting */
+.json-primitive-edit-inline {
+  padding: 0.25rem 0;
+  width: 100%;
+}
+
+.json-primitive-row.editing {
+  background-color: rgba(90, 102, 255, 0.02);
+  border: 1px dashed rgba(90, 102, 255, 0.2);
+}
+
+.json-primitive-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.json-primitive-input {
+  border: 1px solid var(--border);
+  outline: none;
+  background-color: var(--white);
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--primary-text);
+  width: 240px;
+  transition: border-color 0.2s;
+}
+
+.json-primitive-input:focus {
+  border-color: var(--primary-blue);
+}
+
+.json-primitive-edit-btn-action {
+  background: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.json-primitive-edit-btn-action.save {
+  color: #10B981;
+}
+
+.json-primitive-edit-btn-action.save:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.json-primitive-edit-btn-action.cancel {
+  color: #EF4444;
+}
+
+.json-primitive-edit-btn-action.cancel:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}

@@ -1,34 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Plus, Check, X, Pencil } from 'lucide-react';
-import FieldRow from './FieldRow';
-
-interface Field {
-  id: string;
-  name: string;
-  type: string;
-  value: string;
-}
+import JsonNode from './JsonNode';
 
 interface ContainerCardProps {
   id: string;
   title: string;
   isCollapsed: boolean;
-  fields: Field[];
+  data: any;
+  isSchemaTab: boolean;
   onToggleCollapse: (id: string) => void;
-  onAddField: (containerId: string, name: string, type: string, value: string) => void;
-  onEditField: (containerId: string, fieldId: string, name: string, value: string) => void;
   onRenameContainer: (id: string, newTitle: string) => void;
+  onUpdateContainerData: (id: string, updatedData: any) => void;
+  onAddField: (containerId: string, name: string, type: string, value: string) => void;
 }
 
 export const ContainerCard: React.FC<ContainerCardProps> = ({
   id,
   title,
   isCollapsed,
-  fields,
+  data,
+  isSchemaTab,
   onToggleCollapse,
-  onAddField,
-  onEditField,
   onRenameContainer,
+  onUpdateContainerData,
+  onAddField,
 }) => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [fieldName, setFieldName] = useState<string>('');
@@ -36,7 +31,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
   const [fieldValue, setFieldValue] = useState<string>('');
   const fieldInputRef = useRef<HTMLInputElement>(null);
 
-  // States for renaming the container card title inline
+  // States for container title inline editing
   const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(title);
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +50,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
   }, [isEditingTitle]);
 
   const handleStartAdd = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid triggering expand/collapse of the container card itself
+    e.stopPropagation();
     setIsAdding(true);
     setFieldName('');
     setFieldType('Input');
@@ -66,13 +61,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
     const trimmedName = fieldName.trim();
     const trimmedValue = fieldValue.trim();
     if (trimmedName) {
-      // Default value to a sensible default if left blank
-      const finalValue = trimmedValue || (
-        fieldType === 'Checkbox' ? 'False' : 
-        fieldType === 'Date' ? new Date().toISOString().split('T')[0] : 
-        '—'
-      );
-      onAddField(id, trimmedName, fieldType, finalValue);
+      onAddField(id, trimmedName, fieldType, trimmedValue);
       setIsAdding(false);
     } else {
       handleCancel();
@@ -115,7 +104,17 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
     }
   };
 
-  const fieldCount = fields.length;
+  const handlePropChange = (key: string, newVal: any) => {
+    onUpdateContainerData(id, {
+      ...data,
+      [key]: newVal
+    });
+  };
+
+  // Determine which properties of data to display
+  // We filter out FieldName in standard tabs to avoid duplication in the expanded list per refinement 5
+  const displayKeys = Object.keys(data || {}).filter(key => isSchemaTab ? true : key !== 'FieldName');
+  const propertiesCount = displayKeys.length;
 
   return (
     <div className={`container-card ${isCollapsed ? 'collapsed' : 'expanded'}`}>
@@ -149,7 +148,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
               <button
                 className="container-edit-pencil-btn"
                 onClick={handleStartRenameTitle}
-                title="Rename Container"
+                title="Rename"
                 type="button"
               >
                 <Pencil size={13} />
@@ -160,17 +159,17 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
         
         <div className="header-right-side">
           <span className="field-count">
-            {fieldCount} {fieldCount === 1 ? 'Field' : 'Fields'}
+            {isSchemaTab ? `${propertiesCount} Properties` : `${propertiesCount} ${propertiesCount === 1 ? 'Property' : 'Properties'}`}
           </span>
-          {/* Add Field is only shown when container is expanded */}
-          {!isCollapsed && !isAdding && (
+          {/* Add Sub-Property button inside expanded standard cards */}
+          {!isCollapsed && !isAdding && !isSchemaTab && (
             <button 
               onClick={handleStartAdd} 
               className="container-add-field-btn"
               type="button"
             >
               <Plus size={14} />
-              <span>Add Field</span>
+              <span>Add Sub-Property</span>
             </button>
           )}
         </div>
@@ -180,42 +179,52 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
       {!isCollapsed && (
         <div className="container-body">
           <div className="fields-list">
-            {fields.map((field) => (
-              <FieldRow 
-                key={field.id} 
-                id={field.id}
-                name={field.name} 
-                value={field.value} 
-                onEditField={(fieldId, name, value) => onEditField(id, fieldId, name, value)}
-              />
-            ))}
-            
-            {fields.length === 0 && !isAdding && (
-              <div className="empty-fields-message">
-                No fields inside this container. Click "+ Add Field" to get started.
-              </div>
+            {isSchemaTab ? (
+              // 1. Schema Config Tab: render properties of the config object directly
+              data ? (
+                <JsonNode 
+                  label="" 
+                  value={data} 
+                  onChange={(updated) => onUpdateContainerData(id, updated)} 
+                  rootMode={true} 
+                />
+              ) : (
+                <div className="empty-fields-message">No schema properties configured.</div>
+              )
+            ) : (
+              // 2. Standard Tab: render each field property recursively
+              <>
+                {displayKeys.map(key => (
+                  <JsonNode 
+                    key={key} 
+                    label={key} 
+                    value={data[key]}
+                    onChange={(newVal) => handlePropChange(key, newVal)}
+                  />
+                ))}
+              </>
             )}
           </div>
 
-          {/* Inline Add Field Form */}
-          {isAdding && (
+          {/* Inline Add Sub-Property Form */}
+          {isAdding && !isSchemaTab && (
             <div className="inline-field-editor">
               <div className="editor-row">
                 <div className="editor-input-group name-group">
-                  <label className="editor-label">Field Name</label>
+                  <label className="editor-label">Property Name</label>
                   <input
                     ref={fieldInputRef}
                     type="text"
                     value={fieldName}
                     onChange={(e) => setFieldName(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Enter Field Name..."
+                    placeholder="Enter Property Name..."
                     className="editor-input"
                   />
                 </div>
 
                 <div className="editor-input-group value-group">
-                  <label className="editor-label">Default Value</label>
+                  <label className="editor-label">Value</label>
                   <input
                     type="text"
                     value={fieldValue}
@@ -227,22 +236,19 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
                 </div>
                 
                 <div className="editor-input-group type-group">
-                  <label className="editor-label">Field Type</label>
+                  <label className="editor-label">Type</label>
                   <select
                     value={fieldType}
                     onChange={(e) => setFieldType(e.target.value)}
                     className="editor-select"
                   >
-                    <option value="Input">Input</option>
-                    <option value="Select">Select</option>
-                    <option value="Checkbox">Checkbox</option>
-                    <option value="Dropdown">Dropdown</option>
-                    <option value="Date">Date</option>
+                    <option value="Input">Text</option>
+                    <option value="Checkbox">Boolean</option>
                   </select>
                 </div>
                 
                 <div className="editor-actions">
-                  <button onClick={handleSave} className="editor-action-btn save" title="Save Field">
+                  <button onClick={handleSave} className="editor-action-btn save" title="Save Property">
                     <Check size={16} />
                   </button>
                   <button onClick={handleCancel} className="editor-action-btn cancel" title="Cancel">

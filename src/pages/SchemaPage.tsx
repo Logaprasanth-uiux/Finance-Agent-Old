@@ -3,73 +3,28 @@ import { Plus, Check, X } from 'lucide-react';
 import FilterSection from '../components/schema/FilterSection';
 import TabBar from '../components/schema/TabBar';
 import ContainerCard from '../components/schema/ContainerCard';
-
-interface Tab {
-  id: string;
-  name: string;
-}
-
-interface Field {
-  id: string;
-  name: string;
-  type: string;
-  value: string;
-}
-
-interface Container {
-  id: string;
-  title: string;
-  isCollapsed: boolean;
-  fields: Field[];
-}
+import { schemaService } from '../services/schemaService';
+import type { Tab, Container } from '../services/schemaService';
 
 export const SchemaPage: React.FC = () => {
-  // Named placeholder business tabs per UX refinement 1
-  const [tabs, setTabs] = useState<Tab[]>([
-    { id: '1', name: 'General Information' },
-    { id: '2', name: 'Vendor Information' },
-    { id: '3', name: 'Approval Workflow' },
-  ]);
+  // Load workspace tabs dynamically using the Schema Service API (each section represents a Tab)
+  const [tabs, setTabs] = useState<Tab[]>(() => schemaService.getWorkspaceTabs());
   
-  const [activeTabId, setActiveTabId] = useState<string>('1');
+  // Set default active tab dynamically
+  const [activeTabId, setActiveTabId] = useState<string>(() => {
+    const initialTabs = schemaService.getWorkspaceTabs();
+    return initialTabs.length > 0 ? initialTabs[0].id : '';
+  });
 
-  // Maintain separate list of Containers & Fields per tab in state with realistic business value placeholders
-  const [tabContainers, setTabContainers] = useState<Record<string, Container[]>>({
-    '1': [
-      {
-        id: 'c1',
-        title: 'Bill Workflow Information',
-        isCollapsed: false,
-        fields: [
-          { id: 'f1', name: 'Organization Name', type: 'Select', value: 'XYZ Company' },
-          { id: 'f2', name: 'Organization ID', type: 'Input', value: 'ORG-001' },
-          { id: 'f3', name: 'Status', type: 'Input', value: 'Active' },
-        ]
-      }
-    ],
-    '2': [
-      {
-        id: 'c2',
-        title: 'Vendor Details',
-        isCollapsed: false,
-        fields: [
-          { id: 'f4', name: 'Vendor Name', type: 'Input', value: 'Acme Corp' },
-          { id: 'f5', name: 'Tax ID', type: 'Input', value: 'TX-998822' },
-          { id: 'f6', name: 'Upload Mode', type: 'Select', value: 'Manual' }
-        ]
-      }
-    ],
-    '3': [
-      {
-        id: 'c3',
-        title: 'Approval Information',
-        isCollapsed: false,
-        fields: [
-          { id: 'f7', name: 'Approver Role', type: 'Select', value: 'Finance Manager' },
-          { id: 'f8', name: 'Approval Threshold', type: 'Input', value: '$10,000' }
-        ]
-      }
-    ]
+  // Load container configurations dynamically for each tab using the Schema Service API
+  // In standard tabs, each container card represents a specific metadata Field
+  const [tabContainers, setTabContainers] = useState<Record<string, Container[]>>(() => {
+    const initialTabs = schemaService.getWorkspaceTabs();
+    const initialMap: Record<string, Container[]> = {};
+    initialTabs.forEach(t => {
+      initialMap[t.id] = schemaService.getContainers(t.id);
+    });
+    return initialMap;
   });
 
   const [isAddingContainer, setIsAddingContainer] = useState<boolean>(false);
@@ -83,7 +38,7 @@ export const SchemaPage: React.FC = () => {
   }, [isAddingContainer]);
 
   const handleAddTab = (name: string) => {
-    const newTabId = Date.now().toString();
+    const newTabId = name.trim(); // Use the name directly as standard tab IDs represent Sections
     const newTab = { id: newTabId, name };
     setTabs([...tabs, newTab]);
     setTabContainers(prev => ({
@@ -94,7 +49,16 @@ export const SchemaPage: React.FC = () => {
   };
 
   const handleRenameTab = (tabId: string, newName: string) => {
-    setTabs(prev => prev.map(t => t.id === tabId ? { ...t, name: newName } : t));
+    setTabs(prev => prev.map(t => t.id === tabId ? { ...t, name: newName, id: newName } : t));
+    setTabContainers(prev => {
+      const dataCopy = { ...prev };
+      if (dataCopy[tabId]) {
+        dataCopy[newName] = dataCopy[tabId];
+        delete dataCopy[tabId];
+      }
+      return dataCopy;
+    });
+    setActiveTabId(newName);
   };
 
   const handleToggleCollapse = (containerId: string) => {
@@ -110,13 +74,19 @@ export const SchemaPage: React.FC = () => {
     });
   };
 
-  const handleAddField = (containerId: string, name: string, type: string, value: string) => {
+  // Add sub-properties inline inside the field's data model keys list
+  const handleAddSubProperty = (containerId: string, name: string, type: string, value: string) => {
     setTabContainers(prev => {
       const activeContainers = prev[activeTabId] || [];
       const updated = activeContainers.map(c => {
         if (c.id === containerId) {
-          const newField = { id: Date.now().toString(), name, type, value };
-          return { ...c, fields: [...c.fields, newField] };
+          const updatedData = { ...c.data };
+          let finalVal: any = value;
+          if (type === 'Checkbox') {
+            finalVal = value.toLowerCase() === 'true';
+          }
+          updatedData[name] = finalVal;
+          return { ...c, data: updatedData };
         }
         return c;
       });
@@ -127,15 +97,22 @@ export const SchemaPage: React.FC = () => {
     });
   };
 
-  const handleEditField = (containerId: string, fieldId: string, name: string, value: string) => {
+  // Generic callback handling edits occurring at any node level in the JSON outline tree
+  const handleUpdateContainerData = (containerId: string, updatedData: any) => {
     setTabContainers(prev => {
       const activeContainers = prev[activeTabId] || [];
       const updated = activeContainers.map(c => {
         if (c.id === containerId) {
-          const updatedFields = c.fields.map(f => 
-            f.id === fieldId ? { ...f, name, value } : f
-          );
-          return { ...c, fields: updatedFields };
+          // Synchronize card title dynamically if FieldName (standard tab) or Type (schema tab) is renamed inside tree
+          const newTitle = activeTabId === 'schema-tab' 
+            ? (updatedData.Type || c.title) 
+            : (updatedData.FieldName || c.title);
+          
+          return { 
+            ...c, 
+            data: updatedData, 
+            title: newTitle 
+          };
         }
         return c;
       });
@@ -146,12 +123,26 @@ export const SchemaPage: React.FC = () => {
     });
   };
 
+  // Renaming headers directly: syncs bidirectional keys back to FieldName or Type
   const handleRenameContainer = (containerId: string, newTitle: string) => {
     setTabContainers(prev => {
       const activeContainers = prev[activeTabId] || [];
-      const updated = activeContainers.map(c => 
-        c.id === containerId ? { ...c, title: newTitle } : c
-      );
+      const updated = activeContainers.map(c => {
+        if (c.id === containerId) {
+          const updatedData = { ...c.data };
+          if (activeTabId === 'schema-tab') {
+            updatedData.Type = newTitle;
+          } else {
+            updatedData.FieldName = newTitle;
+          }
+          return { 
+            ...c, 
+            title: newTitle, 
+            data: updatedData 
+          };
+        }
+        return c;
+      });
       return {
         ...prev,
         [activeTabId]: updated
@@ -164,14 +155,27 @@ export const SchemaPage: React.FC = () => {
     setNewContainerTitle('');
   };
 
+  // Saves a new collapsible container (a Field object in standard tabs, or a config object in Schema tab)
   const handleSaveContainer = () => {
     const trimmedTitle = newContainerTitle.trim();
     if (trimmedTitle) {
+      const isSchema = activeTabId === 'schema-tab';
+      const containerId = Date.now().toString();
+      
       const newContainer: Container = {
-        id: Date.now().toString(),
+        id: containerId,
         title: trimmedTitle,
-        isCollapsed: false, // Automatically expands upon creation
-        fields: []
+        isCollapsed: false, // Expands automatically
+        data: isSchema ? {
+          Type: trimmedTitle,
+          ScreenName: 'Bill Extraction',
+          moduleName: 'DTFOWS'
+        } : {
+          FieldName: trimmedTitle,
+          FieldType: 'input',
+          FieldEditable: 'true',
+          FieldID: Date.now()
+        }
       };
       
       setTabContainers(prev => {
@@ -201,6 +205,7 @@ export const SchemaPage: React.FC = () => {
   };
 
   const currentContainers = tabContainers[activeTabId] || [];
+  const isSchema = activeTabId === 'schema-tab';
 
   return (
     <div className="schema-page">
@@ -225,24 +230,30 @@ export const SchemaPage: React.FC = () => {
               id={container.id}
               title={container.title}
               isCollapsed={container.isCollapsed}
-              fields={container.fields}
+              data={container.data}
+              isSchemaTab={isSchema}
               onToggleCollapse={handleToggleCollapse}
-              onAddField={handleAddField}
-              onEditField={handleEditField}
               onRenameContainer={handleRenameContainer}
+              onUpdateContainerData={handleUpdateContainerData}
+              onAddField={handleAddSubProperty}
             />
           ))}
 
           {currentContainers.length === 0 && !isAddingContainer && (
             <div className="empty-containers-message">
-              No containers inside this tab. Click "+ Add Container" to create one.
+              {isSchema 
+                ? 'No containers inside this tab. Click "+ Add Container" to create one.' 
+                : 'No fields inside this tab. Click "+ Add Field" to create one.'
+              }
             </div>
           )}
 
           {/* Inline Add Container Form */}
           {isAddingContainer ? (
             <div className="inline-container-editor">
-              <label className="editor-label">Container Name</label>
+              <label className="editor-label">
+                {isSchema ? 'Container Name' : 'Field Name'}
+              </label>
               <div className="inline-container-row">
                 <input
                   ref={containerInputRef}
@@ -250,10 +261,10 @@ export const SchemaPage: React.FC = () => {
                   value={newContainerTitle}
                   onChange={(e) => setNewContainerTitle(e.target.value)}
                   onKeyDown={handleContainerKeyDown}
-                  placeholder="Enter Container Title..."
+                  placeholder={isSchema ? 'Enter Container Title...' : 'Enter Field Name...'}
                   className="container-editor-input"
                 />
-                <button onClick={handleSaveContainer} className="editor-action-btn save" title="Save Container">
+                <button onClick={handleSaveContainer} className="editor-action-btn save" title="Save">
                   <Check size={16} />
                 </button>
                 <button onClick={handleCancelContainer} className="editor-action-btn cancel" title="Cancel">
@@ -268,7 +279,7 @@ export const SchemaPage: React.FC = () => {
               type="button"
             >
               <Plus size={16} />
-              <span>Add Container</span>
+              <span>{isSchema ? 'Add Container' : 'Add Field'}</span>
             </button>
           )}
         </div>
