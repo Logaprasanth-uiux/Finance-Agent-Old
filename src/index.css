@@ -920,13 +920,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 2.75rem 0.85rem 1rem;
   border-bottom: 1px solid var(--border);
   animation: fadeIn 0.3s ease-out;
   cursor: pointer;
   transition: background-color 0.2s ease, padding-left 0.2s ease;
   border-radius: 8px;
   margin: 0.1rem 0;
+  position: relative;
 }
 
 .schema-field-row.interactive:hover {
@@ -1170,4 +1171,223 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Field Row Edit Capability Styling */
+.field-value-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+}
+
+.field-row-edit-btn {
+  background: none;
+  border: none;
+  outline: none;
+  color: #8F9BB3;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.schema-field-row.interactive:hover .field-row-edit-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.field-row-edit-btn:hover {
+  color: var(--primary-blue);
+  background-color: rgba(90, 102, 255, 0.08);
+}
+
+.inline-field-row-editor {
+  padding: 1.25rem;
+  background-color: var(--app-bg);
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  margin: 0.35rem 0;
+  animation: tabFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tab Inline Editing Styles */
+.schema-tab-edit-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: var(--app-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: -2px;
+  flex-shrink: 0;
+  animation: tabFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.schema-tab-input-inline {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--primary-text);
+  width: 140px;
+  padding: 0.15rem 0.25rem;
+}
+
+.schema-tab-edit-btn {
+  background: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.schema-tab-edit-btn.save {
+  color: #10B981;
+}
+
+.schema-tab-edit-btn.save:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.schema-tab-edit-btn.cancel {
+  color: #EF4444;
+}
+
+.schema-tab-edit-btn.cancel:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.schema-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-edit-pencil-btn {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease-in-out;
+  color: #8F9BB3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.schema-tab:hover .tab-edit-pencil-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tab-edit-pencil-btn:hover {
+  color: var(--primary-blue);
+  background-color: rgba(90, 102, 255, 0.08);
+}
+
+/* Container Header Title Inline Editing Styles */
+.container-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.container-edit-pencil-btn {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease-in-out;
+  color: #8F9BB3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.container-header:hover .container-edit-pencil-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.container-edit-pencil-btn:hover {
+  color: var(--primary-blue);
+  background-color: rgba(90, 102, 255, 0.08);
+}
+
+.container-title-edit-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--app-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  animation: tabFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.container-title-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary-text);
+  width: 220px;
+  padding: 0.15rem 0.25rem;
+}
+
+.container-title-btn {
+  background: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.container-title-btn.save {
+  color: #10B981;
+}
+
+.container-title-btn.save:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.container-title-btn.cancel {
+  color: #EF4444;
+}
+
+.container-title-btn.cancel:hover {
+  background-color: rgba(239, 68, 68, 0.1);
 }

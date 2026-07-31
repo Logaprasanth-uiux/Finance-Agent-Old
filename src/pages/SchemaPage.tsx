@@ -93,6 +93,10 @@ export const SchemaPage: React.FC = () => {
     setActiveTabId(newTabId);
   };
 
+  const handleRenameTab = (tabId: string, newName: string) => {
+    setTabs(prev => prev.map(t => t.id === tabId ? { ...t, name: newName } : t));
+  };
+
   const handleToggleCollapse = (containerId: string) => {
     setTabContainers(prev => {
       const activeContainers = prev[activeTabId] || [];
@@ -116,6 +120,38 @@ export const SchemaPage: React.FC = () => {
         }
         return c;
       });
+      return {
+        ...prev,
+        [activeTabId]: updated
+      };
+    });
+  };
+
+  const handleEditField = (containerId: string, fieldId: string, name: string, value: string) => {
+    setTabContainers(prev => {
+      const activeContainers = prev[activeTabId] || [];
+      const updated = activeContainers.map(c => {
+        if (c.id === containerId) {
+          const updatedFields = c.fields.map(f => 
+            f.id === fieldId ? { ...f, name, value } : f
+          );
+          return { ...c, fields: updatedFields };
+        }
+        return c;
+      });
+      return {
+        ...prev,
+        [activeTabId]: updated
+      };
+    });
+  };
+
+  const handleRenameContainer = (containerId: string, newTitle: string) => {
+    setTabContainers(prev => {
+      const activeContainers = prev[activeTabId] || [];
+      const updated = activeContainers.map(c => 
+        c.id === containerId ? { ...c, title: newTitle } : c
+      );
       return {
         ...prev,
         [activeTabId]: updated
@@ -177,6 +213,7 @@ export const SchemaPage: React.FC = () => {
         activeTabId={activeTabId} 
         setActiveTabId={setActiveTabId} 
         onAddTab={handleAddTab}
+        onRenameTab={handleRenameTab}
       />
 
       {/* Container List Workspace */}
@@ -191,6 +228,8 @@ export const SchemaPage: React.FC = () => {
               fields={container.fields}
               onToggleCollapse={handleToggleCollapse}
               onAddField={handleAddField}
+              onEditField={handleEditField}
+              onRenameContainer={handleRenameContainer}
             />
           ))}
 

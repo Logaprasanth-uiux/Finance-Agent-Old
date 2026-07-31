@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, ChevronRight, Plus, Check, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Check, X, Pencil } from 'lucide-react';
 import FieldRow from './FieldRow';
 
 interface Field {
@@ -16,6 +16,8 @@ interface ContainerCardProps {
   fields: Field[];
   onToggleCollapse: (id: string) => void;
   onAddField: (containerId: string, name: string, type: string, value: string) => void;
+  onEditField: (containerId: string, fieldId: string, name: string, value: string) => void;
+  onRenameContainer: (id: string, newTitle: string) => void;
 }
 
 export const ContainerCard: React.FC<ContainerCardProps> = ({
@@ -25,6 +27,8 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
   fields,
   onToggleCollapse,
   onAddField,
+  onEditField,
+  onRenameContainer,
 }) => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [fieldName, setFieldName] = useState<string>('');
@@ -32,11 +36,23 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
   const [fieldValue, setFieldValue] = useState<string>('');
   const fieldInputRef = useRef<HTMLInputElement>(null);
 
+  // States for renaming the container card title inline
+  const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
+  const [editTitle, setEditTitle] = useState<string>(title);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (isAdding && fieldInputRef.current) {
       fieldInputRef.current.focus();
     }
   }, [isAdding]);
+
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
 
   const handleStartAdd = (e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering expand/collapse of the container card itself
@@ -77,6 +93,28 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
     }
   };
 
+  const handleStartRenameTitle = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent toggling the collapse state of the container card
+    setIsEditingTitle(true);
+    setEditTitle(title);
+  };
+
+  const handleSaveTitle = () => {
+    const trimmed = editTitle.trim();
+    if (trimmed) {
+      onRenameContainer(id, trimmed);
+    }
+    setIsEditingTitle(false);
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle();
+    } else if (e.key === 'Escape') {
+      setIsEditingTitle(false);
+    }
+  };
+
   const fieldCount = fields.length;
 
   return (
@@ -87,14 +125,44 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
           <span className="collapse-icon">
             {isCollapsed ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
           </span>
-          <h3 className="container-title">{title}</h3>
+          {isEditingTitle ? (
+            <div className="container-title-edit-wrapper" onClick={(e) => e.stopPropagation()}>
+              <input
+                ref={titleInputRef}
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onKeyDown={handleTitleKeyDown}
+                className="container-title-input"
+                maxLength={45}
+              />
+              <button onClick={handleSaveTitle} className="container-title-btn save" title="Save Title">
+                <Check size={12} />
+              </button>
+              <button onClick={() => setIsEditingTitle(false)} className="container-title-btn cancel" title="Cancel">
+                <X size={12} />
+              </button>
+            </div>
+          ) : (
+            <div className="container-title-wrapper">
+              <h3 className="container-title">{title}</h3>
+              <button
+                className="container-edit-pencil-btn"
+                onClick={handleStartRenameTitle}
+                title="Rename Container"
+                type="button"
+              >
+                <Pencil size={13} />
+              </button>
+            </div>
+          )}
         </div>
         
         <div className="header-right-side">
           <span className="field-count">
             {fieldCount} {fieldCount === 1 ? 'Field' : 'Fields'}
           </span>
-          {/* Add Field is only shown when container is expanded per UX refinement 2 */}
+          {/* Add Field is only shown when container is expanded */}
           {!isCollapsed && !isAdding && (
             <button 
               onClick={handleStartAdd} 
@@ -113,7 +181,13 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
         <div className="container-body">
           <div className="fields-list">
             {fields.map((field) => (
-              <FieldRow key={field.id} name={field.name} value={field.value} />
+              <FieldRow 
+                key={field.id} 
+                id={field.id}
+                name={field.name} 
+                value={field.value} 
+                onEditField={(fieldId, name, value) => onEditField(id, fieldId, name, value)}
+              />
             ))}
             
             {fields.length === 0 && !isAdding && (

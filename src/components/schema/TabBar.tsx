@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Check, X, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 
 interface Tab {
   id: string;
@@ -11,15 +11,26 @@ interface TabBarProps {
   activeTabId: string;
   setActiveTabId: (id: string) => void;
   onAddTab: (name: string) => void;
+  onRenameTab: (tabId: string, newName: string) => void;
 }
 
-export const TabBar: React.FC<TabBarProps> = ({ tabs, activeTabId, setActiveTabId, onAddTab }) => {
+export const TabBar: React.FC<TabBarProps> = ({ 
+  tabs, 
+  activeTabId, 
+  setActiveTabId, 
+  onAddTab,
+  onRenameTab 
+}) => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [newTabName, setNewTabName] = useState<string>('');
+  const [editingTabId, setEditingTabId] = useState<string | null>(null);
+  const [editTabName, setEditTabName] = useState<string>('');
+  
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(false);
   
   const inputRef = useRef<HTMLInputElement>(null);
+  const tabEditInputRef = useRef<HTMLInputElement>(null);
   const tabsListRef = useRef<HTMLDivElement>(null);
 
   const checkScroll = () => {
@@ -34,13 +45,20 @@ export const TabBar: React.FC<TabBarProps> = ({ tabs, activeTabId, setActiveTabI
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
-  }, [tabs, isAdding]);
+  }, [tabs, isAdding, editingTabId]);
 
   useEffect(() => {
     if (isAdding && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isAdding]);
+
+  useEffect(() => {
+    if (editingTabId && tabEditInputRef.current) {
+      tabEditInputRef.current.focus();
+      tabEditInputRef.current.select();
+    }
+  }, [editingTabId]);
 
   useEffect(() => {
     if (tabsListRef.current) {
@@ -86,6 +104,28 @@ export const TabBar: React.FC<TabBarProps> = ({ tabs, activeTabId, setActiveTabI
     }
   };
 
+  const handleStartRename = (e: React.MouseEvent, tabId: string, currentName: string) => {
+    e.stopPropagation(); // Avoid activating/selecting the tab when clicking edit
+    setEditingTabId(tabId);
+    setEditTabName(currentName);
+  };
+
+  const handleSaveRename = (tabId: string) => {
+    const trimmed = editTabName.trim();
+    if (trimmed) {
+      onRenameTab(tabId, trimmed);
+    }
+    setEditingTabId(null);
+  };
+
+  const handleRenameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, tabId: string) => {
+    if (e.key === 'Enter') {
+      handleSaveRename(tabId);
+    } else if (e.key === 'Escape') {
+      setEditingTabId(null);
+    }
+  };
+
   const scrollLeftAction = () => {
     if (tabsListRef.current) {
       tabsListRef.current.scrollBy({ left: -160, behavior: 'smooth' });
@@ -112,17 +152,52 @@ export const TabBar: React.FC<TabBarProps> = ({ tabs, activeTabId, setActiveTabI
         </button>
         
         <div className="schema-tabs-list" ref={tabsListRef} onScroll={checkScroll}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTabId(tab.id)}
-              className={`schema-tab ${activeTabId === tab.id ? 'active' : ''}`}
-              title={tab.name}
-            >
-              {tab.name}
-            </button>
-          ))}
+          {tabs.map((tab) => {
+            const isEditingThisTab = editingTabId === tab.id;
+            const isActive = activeTabId === tab.id;
+
+            if (isEditingThisTab) {
+              return (
+                <div key={tab.id} className="schema-tab-edit-inline" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    ref={tabEditInputRef}
+                    type="text"
+                    value={editTabName}
+                    onChange={(e) => setEditTabName(e.target.value)}
+                    onKeyDown={(e) => handleRenameKeyDown(e, tab.id)}
+                    className="schema-tab-input-inline"
+                    maxLength={25}
+                  />
+                  <button onClick={() => handleSaveRename(tab.id)} className="schema-tab-edit-btn save" title="Save">
+                    <Check size={12} />
+                  </button>
+                  <button onClick={() => setEditingTabId(null)} className="schema-tab-edit-btn cancel" title="Cancel">
+                    <X size={12} />
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTabId(tab.id)}
+                className={`schema-tab ${isActive ? 'active' : ''}`}
+                title={tab.name}
+              >
+                <span className="tab-label-text">{tab.name}</span>
+                <span 
+                  className="tab-edit-pencil-btn" 
+                  onClick={(e) => handleStartRename(e, tab.id, tab.name)}
+                  title="Rename Tab"
+                >
+                  <Pencil size={13} />
+                </span>
+              </button>
+            );
+          })}
           
+          {/* Inline Add Tab Editor */}
           {isAdding && (
             <div className="schema-tab-edit-wrapper">
               <input
