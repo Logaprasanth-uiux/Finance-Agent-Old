@@ -1632,3 +1632,12 @@ body {
 .json-primitive-edit-btn-action.cancel:hover {
   background-color: rgba(239, 68, 68, 0.1);
 }
+
+.tab-label-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  text-align: center;
+}
