@@ -17,6 +17,7 @@ export const navigationConfig: NavigationItem[] = [
   { path: '/ap', label: 'AP', iconName: 'ArrowDownLeft', hasChevron: true },
   { path: '/ar', label: 'AR', iconName: 'ArrowUpRight', hasChevron: true },
   { path: '/fscp', label: 'FSCP', iconName: 'ShieldCheck', hasChevron: true },
+  { path: '/schema', label: 'Schema', iconName: 'Database' },
   { path: '/config', label: 'Config', iconName: 'Settings' },
   { path: '/admin', label: 'Admin (DT)', iconName: 'ShieldAlert' },
 ];
