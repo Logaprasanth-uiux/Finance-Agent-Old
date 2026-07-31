@@ -1,9 +1,8 @@
-import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Menu, Search, ChevronDown, Store, FileText, RefreshCw } from 'lucide-react';
 import { navigationConfig } from '../config/navigation';
 
-export const Header: React.FC = () => {
+export const Header = () => {
   const location = useLocation();
   
   // Find current label based on path

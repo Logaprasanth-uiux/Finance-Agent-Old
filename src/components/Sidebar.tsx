@@ -1,9 +1,8 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { navigationConfig } from '../config/navigation';
 
-export const Sidebar: React.FC = () => {
+export const Sidebar = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">

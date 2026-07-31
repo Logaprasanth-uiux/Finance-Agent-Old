@@ -1,4 +1,3 @@
-import React from 'react';
 import * as Icons from 'lucide-react';
 
 interface PlaceholderPageProps {
@@ -7,7 +6,7 @@ interface PlaceholderPageProps {
   iconName: string;
 }
 
-export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ title, description, iconName }) => {
+export const PlaceholderPage = ({ title, description, iconName }: PlaceholderPageProps) => {
   // Resolve icon component dynamically
   const IconComponent = (Icons as any)[iconName] || Icons.HelpCircle;
 
