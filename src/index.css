@@ -1641,3 +1641,185 @@ body {
   min-width: 0;
   text-align: center;
 }
+
+/* ==========================================================================
+   TAB NAVIGATOR & DRAG-AND-DROP STYLING
+   ========================================================================== */
+.schema-tab-dropdown-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+
+.schema-tab-dropdown-btn {
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  color: var(--secondary-text);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.schema-tab-dropdown-btn:hover {
+  background-color: var(--app-bg);
+  color: var(--primary-text);
+  border-color: var(--border-hover);
+}
+
+.schema-tab-dropdown-btn.active {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  border-color: rgba(79, 70, 229, 0.25);
+}
+
+.schema-tab-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px); /* Open directly below button with 8px spacing */
+  left: 0;
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.08); /* Soft shadow */
+  min-width: 300px; /* Minimum width of 300px */
+  max-height: 300px;
+  z-index: 1050; /* Float high above page content */
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transform-origin: top left;
+  animation: tabDropdownFadeInScale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tabDropdownFadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.schema-navigator-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 250px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.schema-dropdown-item {
+  background: none;
+  border: none;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 0.9rem; /* comfortable spacing */
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--secondary-text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.schema-dropdown-item:hover {
+  background-color: var(--app-bg);
+  color: var(--primary-text);
+}
+
+.schema-dropdown-item.active {
+  background-color: rgba(79, 70, 229, 0.08);
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.dropdown-tab-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  flex: 1;
+  margin-right: 1.5rem; /* space between text and count */
+}
+
+.dropdown-tab-count {
+  font-size: 11px;
+  color: var(--secondary-text);
+  background-color: var(--app-bg);
+  padding: 0.15rem 0.45rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.schema-dropdown-item.active .dropdown-tab-count {
+  color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.12);
+  border-color: rgba(79, 70, 229, 0.2);
+  opacity: 1;
+}
+
+.schema-dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1040; /* Sit just below menu */
+  background: transparent;
+}
+
+/* Drag Handle and Card States */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  cursor: grab;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.drag-handle:hover {
+  background-color: var(--app-bg);
+  color: #4f46e5;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* opacity & visual drop feedback */
+.container-card.dragging {
+  opacity: 0.35 !important;
+  border: 1px dashed #4f46e5 !important;
+  box-shadow: none !important;
+  position: relative;
+}
+
+.container-card.dragging::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #4f46e5;
+  border-radius: 3px 3px 0 0;
+  z-index: 10;
+}

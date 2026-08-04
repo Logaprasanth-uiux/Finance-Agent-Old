@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, ChevronRight, Plus, Check, X, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Check, X, Pencil, GripVertical } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import JsonNode from './JsonNode';
 
 interface ContainerCardProps {
@@ -25,6 +27,19 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
   onUpdateContainerData,
   onAddField,
 }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [fieldName, setFieldName] = useState<string>('');
   const [fieldType, setFieldType] = useState<string>('Input');
@@ -117,10 +132,24 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
   const propertiesCount = displayKeys.length;
 
   return (
-    <div className={`container-card ${isCollapsed ? 'collapsed' : 'expanded'}`}>
+    <div 
+      ref={setNodeRef}
+      style={style}
+      className={`container-card ${isCollapsed ? 'collapsed' : 'expanded'} ${isDragging ? 'dragging' : ''}`}
+    >
       {/* Header */}
       <div className="container-header" onClick={() => onToggleCollapse(id)}>
         <div className="header-left-side">
+          {/* Drag Handle */}
+          <div 
+            className="drag-handle" 
+            {...attributes} 
+            {...listeners}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical size={16} />
+          </div>
+          
           <span className="collapse-icon">
             {isCollapsed ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
           </span>

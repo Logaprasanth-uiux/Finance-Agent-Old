@@ -1,5 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Check, X } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import FilterSection from '../components/schema/FilterSection';
 import TabBar from '../components/schema/TabBar';
 import ContainerCard from '../components/schema/ContainerCard';
@@ -204,6 +219,37 @@ export const SchemaPage: React.FC = () => {
     }
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setTabContainers((prev) => {
+        const containers = prev[activeTabId] || [];
+        const oldIndex = containers.findIndex((c) => c.id === active.id);
+        const newIndex = containers.findIndex((c) => c.id === over.id);
+        
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const updated = arrayMove(containers, oldIndex, newIndex);
+          return {
+            ...prev,
+            [activeTabId]: updated
+          };
+        }
+        return prev;
+      });
+    }
+  };
+
   const currentContainers = tabContainers[activeTabId] || [];
   const isSchema = activeTabId === 'schema-tab';
 
@@ -219,70 +265,82 @@ export const SchemaPage: React.FC = () => {
         setActiveTabId={setActiveTabId} 
         onAddTab={handleAddTab}
         onRenameTab={handleRenameTab}
+        tabContainers={tabContainers}
       />
 
       {/* Container List Workspace */}
       <div className="schema-workspace-container">
-        <div className="schema-containers-list">
-          {currentContainers.map((container) => (
-            <ContainerCard
-              key={container.id}
-              id={container.id}
-              title={container.title}
-              isCollapsed={container.isCollapsed}
-              data={container.data}
-              isSchemaTab={isSchema}
-              onToggleCollapse={handleToggleCollapse}
-              onRenameContainer={handleRenameContainer}
-              onUpdateContainerData={handleUpdateContainerData}
-              onAddField={handleAddSubProperty}
-            />
-          ))}
-
-          {currentContainers.length === 0 && !isAddingContainer && (
-            <div className="empty-containers-message">
-              {isSchema 
-                ? 'No containers inside this tab. Click "+ Add Container" to create one.' 
-                : 'No fields inside this tab. Click "+ Add Field" to create one.'
-              }
-            </div>
-          )}
-
-          {/* Inline Add Container Form */}
-          {isAddingContainer ? (
-            <div className="inline-container-editor">
-              <label className="editor-label">
-                {isSchema ? 'Container Name' : 'Field Name'}
-              </label>
-              <div className="inline-container-row">
-                <input
-                  ref={containerInputRef}
-                  type="text"
-                  value={newContainerTitle}
-                  onChange={(e) => setNewContainerTitle(e.target.value)}
-                  onKeyDown={handleContainerKeyDown}
-                  placeholder={isSchema ? 'Enter Container Title...' : 'Enter Field Name...'}
-                  className="container-editor-input"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={currentContainers.map(c => c.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="schema-containers-list">
+              {currentContainers.map((container) => (
+                <ContainerCard
+                  key={container.id}
+                  id={container.id}
+                  title={container.title}
+                  isCollapsed={container.isCollapsed}
+                  data={container.data}
+                  isSchemaTab={isSchema}
+                  onToggleCollapse={handleToggleCollapse}
+                  onRenameContainer={handleRenameContainer}
+                  onUpdateContainerData={handleUpdateContainerData}
+                  onAddField={handleAddSubProperty}
                 />
-                <button onClick={handleSaveContainer} className="editor-action-btn save" title="Save">
-                  <Check size={16} />
+              ))}
+
+              {currentContainers.length === 0 && !isAddingContainer && (
+                <div className="empty-containers-message">
+                  {isSchema 
+                    ? 'No containers inside this tab. Click "+ Add Container" to create one.' 
+                    : 'No fields inside this tab. Click "+ Add Field" to create one.'
+                  }
+                </div>
+              )}
+
+              {/* Inline Add Container Form */}
+              {isAddingContainer ? (
+                <div className="inline-container-editor">
+                  <label className="editor-label">
+                    {isSchema ? 'Container Name' : 'Field Name'}
+                  </label>
+                  <div className="inline-container-row">
+                    <input
+                      ref={containerInputRef}
+                      type="text"
+                      value={newContainerTitle}
+                      onChange={(e) => setNewContainerTitle(e.target.value)}
+                      onKeyDown={handleContainerKeyDown}
+                      placeholder={isSchema ? 'Enter Container Title...' : 'Enter Field Name...'}
+                      className="container-editor-input"
+                    />
+                    <button onClick={handleSaveContainer} className="editor-action-btn save" title="Save">
+                      <Check size={16} />
+                    </button>
+                    <button onClick={handleCancelContainer} className="editor-action-btn cancel" title="Cancel">
+                      <X size={16} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={handleStartAddContainer} 
+                  className="schema-add-container-btn"
+                  type="button"
+                >
+                  <Plus size={16} />
+                  <span>{isSchema ? 'Add Container' : 'Add Field'}</span>
                 </button>
-                <button onClick={handleCancelContainer} className="editor-action-btn cancel" title="Cancel">
-                  <X size={16} />
-                </button>
-              </div>
+              )}
             </div>
-          ) : (
-            <button 
-              onClick={handleStartAddContainer} 
-              className="schema-add-container-btn"
-              type="button"
-            >
-              <Plus size={16} />
-              <span>{isSchema ? 'Add Container' : 'Add Field'}</span>
-            </button>
-          )}
-        </div>
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
   );

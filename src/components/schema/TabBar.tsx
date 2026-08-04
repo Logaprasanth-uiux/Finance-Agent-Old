@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Check, X, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
+import { Plus, Check, X, ChevronLeft, ChevronRight, Pencil, Menu } from 'lucide-react';
 
 interface Tab {
   id: string;
@@ -12,19 +12,78 @@ interface TabBarProps {
   setActiveTabId: (id: string) => void;
   onAddTab: (name: string) => void;
   onRenameTab: (tabId: string, newName: string) => void;
+  tabContainers: Record<string, any[]>;
 }
+
+interface SchemaNavigatorProps {
+  tabs: Tab[];
+  activeTabId: string;
+  setActiveTabId: (id: string) => void;
+  tabContainers: Record<string, any[]>;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const SchemaNavigator: React.FC<SchemaNavigatorProps> = ({
+  tabs,
+  activeTabId,
+  setActiveTabId,
+  tabContainers,
+  isOpen,
+  onClose
+}) => {
+  const activeDropdownItemRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (isOpen && activeDropdownItemRef.current) {
+      activeDropdownItemRef.current.scrollIntoView({ block: 'nearest', behavior: 'instant' as any });
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="schema-dropdown-backdrop" onClick={onClose} />
+      <div className="schema-tab-dropdown-menu">
+        <div className="schema-navigator-list">
+          {tabs.map((tab) => {
+            const count = tabContainers[tab.id]?.length || 0;
+            const isActive = activeTabId === tab.id;
+            return (
+              <button
+                key={tab.id}
+                ref={isActive ? activeDropdownItemRef : null}
+                onClick={() => {
+                  setActiveTabId(tab.id);
+                  onClose();
+                }}
+                className={`schema-dropdown-item ${isActive ? 'active' : ''}`}
+              >
+                <span className="dropdown-tab-name">{tab.name}</span>
+                <span className="dropdown-tab-count">({count})</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+};
 
 export const TabBar: React.FC<TabBarProps> = ({ 
   tabs, 
   activeTabId, 
   setActiveTabId, 
   onAddTab,
-  onRenameTab 
+  onRenameTab,
+  tabContainers
 }) => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [newTabName, setNewTabName] = useState<string>('');
   const [editingTabId, setEditingTabId] = useState<string | null>(null);
   const [editTabName, setEditTabName] = useState<string>('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(false);
@@ -140,6 +199,28 @@ export const TabBar: React.FC<TabBarProps> = ({
 
   return (
     <div className="schema-tabs-container">
+      {/* Dropdown Tab Navigator */}
+      <div className="schema-tab-dropdown-wrapper">
+        <button 
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={`schema-tab-dropdown-btn ${isDropdownOpen ? 'active' : ''}`}
+          type="button"
+          title="Quick Navigation Panel"
+          aria-label="Tab Navigator"
+        >
+          <Menu size={16} />
+        </button>
+        
+        <SchemaNavigator
+          tabs={tabs}
+          activeTabId={activeTabId}
+          setActiveTabId={setActiveTabId}
+          tabContainers={tabContainers}
+          isOpen={isDropdownOpen}
+          onClose={() => setIsDropdownOpen(false)}
+        />
+      </div>
+
       <div className="schema-tabs-navigation">
         <button 
           onClick={scrollLeftAction} 
