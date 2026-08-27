@@ -41,6 +41,7 @@ export interface MatchedInvoice {
   advanceAdjusted: number;
   netAmount: number;
   matchStatus: '100% Exact Match' | 'Rule-Based Match' | 'AI Suggested Match' | 'Manual Match';
+  erpStatus?: ERPStatus;
   linkedRecords: LinkedRecord[];
 }
 
@@ -79,4 +80,5 @@ export interface ARPayment {
   suggestedMatches?: SuggestedInvoiceMatch[];
   notes?: string;
   attachment?: PaymentAttachment;
+  attachments?: PaymentAttachment[];
 }

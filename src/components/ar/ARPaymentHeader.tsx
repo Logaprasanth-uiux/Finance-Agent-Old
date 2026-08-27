@@ -128,10 +128,17 @@ export const ARPaymentHeader: React.FC<ARPaymentHeaderProps> = ({
     );
   };
 
+  const allAttachments: PaymentAttachment[] =
+    payment.attachments && payment.attachments.length > 0
+      ? payment.attachments
+      : payment.attachment
+      ? [payment.attachment]
+      : [];
+
   return (
     <div className="ar-payment-header-card">
       <div className="ar-payment-header-card__top">
-        {/* Left: Sender + Payment Information + Attachment */}
+        {/* Left: Sender + Payment Information + Attachments */}
         <div className="ar-payment-header-card__identity-zone">
           <div
             className="ar-payment-header-card__avatar"
@@ -158,23 +165,26 @@ export const ARPaymentHeader: React.FC<ARPaymentHeaderProps> = ({
               </span>
             </div>
 
-            {/* Attachment placed below payment amount & method */}
-            {payment.attachment && (
-              <div className="ar-payment-header-card__attachment-wrap">
-                <button
-                  type="button"
-                  onClick={() => onOpenAttachment?.(payment.attachment!)}
-                  className="ar-header-attachment-btn"
-                  title={`View ${payment.attachment.name} (${payment.attachment.size})`}
-                >
-                  <Paperclip size={13} className="ar-header-attachment-btn__icon" />
-                  <span className="ar-header-attachment-btn__name">
-                    {payment.attachment.name}
-                  </span>
-                  <span className="ar-header-attachment-btn__size">
-                    ({payment.attachment.size})
-                  </span>
-                </button>
+            {/* Attachments placed below payment amount & method */}
+            {allAttachments.length > 0 && (
+              <div className="ar-payment-header-card__attachments-stack">
+                {allAttachments.map((att, idx) => (
+                  <button
+                    key={`${att.name}-${idx}`}
+                    type="button"
+                    onClick={() => onOpenAttachment?.(att)}
+                    className="ar-header-attachment-btn"
+                    title={`View ${att.name} (${att.size})`}
+                  >
+                    <Paperclip size={13} className="ar-header-attachment-btn__icon" />
+                    <span className="ar-header-attachment-btn__name">
+                      {att.name}
+                    </span>
+                    <span className="ar-header-attachment-btn__size">
+                      ({att.size})
+                    </span>
+                  </button>
+                ))}
               </div>
             )}
           </div>

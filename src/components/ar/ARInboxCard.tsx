@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ARPayment, PaymentAttachment } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
-import { CheckCircle2, Clock, AlertTriangle, FileCheck, Layers, Paperclip } from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, FileCheck } from 'lucide-react';
 
 interface ARInboxCardProps {
   payment: ARPayment;
@@ -14,7 +14,6 @@ export const ARInboxCard: React.FC<ARInboxCardProps> = ({
   payment,
   isSelected,
   onSelect,
-  onOpenAttachment,
 }) => {
   const getStatusBadge = () => {
     switch (payment.status) {
@@ -48,8 +47,6 @@ export const ARInboxCard: React.FC<ARInboxCardProps> = ({
         );
     }
   };
-
-  const matchedCount = payment.matchedInvoices.length;
 
   return (
     <div
@@ -90,49 +87,10 @@ export const ARInboxCard: React.FC<ARInboxCardProps> = ({
         <div className="ar-inbox-card__amount">
           {formatCurrencyINR(payment.paymentAmount)}
         </div>
-        <div className="ar-inbox-card__ref" title={payment.paymentRef}>
-          Ref: {payment.paymentRef}
+        <div className="ar-inbox-card__status-wrap">
+          {getStatusBadge()}
         </div>
       </div>
-
-      {/* Attachment Chip if available */}
-      {payment.attachment && (
-        <div className="ar-inbox-card__attach-row">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenAttachment?.(payment.attachment!);
-            }}
-            className="ar-inbox-card__attach-chip"
-            title={`View ${payment.attachment.name}`}
-          >
-            <Paperclip size={11} className="ar-inbox-card__attach-icon" />
-            <span className="ar-inbox-card__attach-text">PDF Attachment</span>
-            <span className="ar-inbox-card__attach-size">({payment.attachment.size})</span>
-          </button>
-        </div>
-      )}
-
-      <div className="ar-inbox-card__footer">
-        <div className="ar-inbox-card__invoices-count">
-          <Layers size={13} />
-          <span>
-            {matchedCount === 0
-              ? '0 matched'
-              : matchedCount === 1
-              ? '1 invoice matched'
-              : `${matchedCount} invoices matched`}
-          </span>
-        </div>
-        <div>{getStatusBadge()}</div>
-      </div>
-
-      {payment.erpStatus === 'Posted' && (
-        <div className="ar-inbox-card__sap-pill">
-          <span>SAP Doc: {payment.sapDoc}</span>
-        </div>
-      )}
     </div>
   );
 };

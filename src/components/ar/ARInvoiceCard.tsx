@@ -11,6 +11,8 @@ import {
   Layers,
   ArrowDownRight,
   ShieldCheck,
+  Send,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface ARInvoiceCardProps {
@@ -23,10 +25,68 @@ export const ARInvoiceCard: React.FC<ARInvoiceCardProps> = ({
   defaultExpanded = true,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isInvoicePosting, setIsInvoicePosting] = useState(false);
+  const [invoicePosted, setInvoicePosted] = useState(
+    invoice.erpStatus === 'Posted' || invoice.sapDoc !== '—'
+  );
+
+  const handlePostInvoice = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsInvoicePosting(true);
+    setTimeout(() => {
+      setIsInvoicePosting(false);
+      setInvoicePosted(true);
+    }, 700);
+  };
+
+  const renderInvoiceERPAction = () => {
+    if (invoicePosted) {
+      return (
+        <span
+          className="ar-invoice-erp-badge ar-invoice-erp-badge--posted"
+          title="Invoice cleared and posted to SAP"
+        >
+          <CheckCircle2 size={12} />
+          Posted
+        </span>
+      );
+    }
+
+    const isReady =
+      invoice.erpStatus === 'Ready to Post' ||
+      (!invoice.erpStatus && invoice.matchStatus === '100% Exact Match');
+
+    if (isReady) {
+      return (
+        <button
+          type="button"
+          onClick={handlePostInvoice}
+          disabled={isInvoicePosting}
+          className="ar-invoice-erp-btn ar-invoice-erp-btn--ready"
+          title="Post this individual invoice to SAP ERP"
+        >
+          <Send size={11} className={isInvoicePosting ? 'ar-spin' : ''} />
+          <span>{isInvoicePosting ? 'Posting...' : 'Post to ERP'}</span>
+        </button>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        disabled={true}
+        className="ar-invoice-erp-btn ar-invoice-erp-btn--disabled"
+        title="Invoice must be fully matched before posting"
+      >
+        <AlertTriangle size={11} />
+        <span>Not ready</span>
+      </button>
+    );
+  };
 
   return (
     <div className={`ar-invoice-card ${isExpanded ? 'ar-invoice-card--expanded' : ''}`}>
-      {/* Collapsed Header / Summary Bar */}
+      {/* Invoice Header */}
       <div
         className="ar-invoice-card__header"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -38,53 +98,77 @@ export const ARInvoiceCard: React.FC<ARInvoiceCardProps> = ({
           }
         }}
       >
-        <div className="ar-invoice-card__header-left">
-          <button
-            className="ar-invoice-card__expand-btn"
-            aria-label={isExpanded ? 'Collapse invoice' : 'Expand invoice'}
-          >
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
+        {/* Top: Left Info & Right Financial Stats */}
+        <div className="ar-invoice-card__header-main">
+          <div className="ar-invoice-card__header-left">
+            <button
+              className="ar-invoice-card__expand-btn"
+              aria-label={isExpanded ? 'Collapse invoice' : 'Expand invoice'}
+            >
+              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
 
-          <div className="ar-invoice-card__doc-info">
-            <div className="ar-invoice-card__ref-row">
-              <span className="ar-invoice-card__badge">
-                <FileText size={12} />
-                {invoice.docRef}
-              </span>
-              <span className="ar-invoice-card__match-badge">
-                <ShieldCheck size={12} />
-                {invoice.matchStatus}
-              </span>
+            <div className="ar-invoice-card__doc-info">
+              <div className="ar-invoice-card__ref-row">
+                <span className="ar-invoice-card__badge">
+                  <FileText size={12} />
+                  {invoice.docRef}
+                </span>
+                <span className="ar-invoice-card__match-badge">
+                  <ShieldCheck size={12} />
+                  {invoice.matchStatus}
+                </span>
+              </div>
+              <h4 className="ar-invoice-card__desc" title={invoice.description}>
+                {invoice.description}
+              </h4>
             </div>
-            <h4 className="ar-invoice-card__desc" title={invoice.description}>
-              {invoice.description}
-            </h4>
+          </div>
+
+          <div className="ar-invoice-card__header-right">
+            <div className="ar-invoice-card__quick-amounts">
+              <div className="ar-invoice-card__quick-stat">
+                <span className="ar-invoice-card__quick-label">Gross</span>
+                <span className="ar-invoice-card__quick-val">
+                  {formatCurrencyINR(invoice.grossAmount)}
+                </span>
+              </div>
+
+              <div className="ar-invoice-card__quick-stat">
+                <span className="ar-invoice-card__quick-label">TDS</span>
+                <span className="ar-invoice-card__quick-val ar-invoice-card__quick-val--tds">
+                  - {formatCurrencyINR(invoice.tdsAmount)}
+                </span>
+              </div>
+
+              <div className="ar-invoice-card__quick-stat ar-invoice-card__quick-stat--net">
+                <span className="ar-invoice-card__quick-label">Net Settled</span>
+                <span className="ar-invoice-card__quick-val ar-invoice-card__quick-val--net">
+                  {formatCurrencyINR(invoice.netAmount)}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="ar-invoice-card__header-right">
-          <div className="ar-invoice-card__quick-amounts">
-            <div className="ar-invoice-card__quick-stat">
-              <span className="ar-invoice-card__quick-label">Gross</span>
-              <span className="ar-invoice-card__quick-val">
-                {formatCurrencyINR(invoice.grossAmount)}
+        {/* Action Row: Dedicated ERP Action & Meta */}
+        <div
+          className="ar-invoice-card__action-row"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="ar-invoice-card__action-meta">
+            <span className="ar-invoice-card__meta-pill">
+              Txn: <strong>{invoice.txnDate}</strong>
+            </span>
+            {invoice.sapDoc !== '—' && (
+              <span className="ar-invoice-card__meta-pill ar-invoice-card__meta-pill--sap">
+                SAP Doc: <strong>{invoice.sapDoc}</strong>
               </span>
-            </div>
+            )}
+          </div>
 
-            <div className="ar-invoice-card__quick-stat">
-              <span className="ar-invoice-card__quick-label">TDS</span>
-              <span className="ar-invoice-card__quick-val ar-invoice-card__quick-val--tds">
-                - {formatCurrencyINR(invoice.tdsAmount)}
-              </span>
-            </div>
-
-            <div className="ar-invoice-card__quick-stat ar-invoice-card__quick-stat--net">
-              <span className="ar-invoice-card__quick-label">Net Settled</span>
-              <span className="ar-invoice-card__quick-val ar-invoice-card__quick-val--net">
-                {formatCurrencyINR(invoice.netAmount)}
-              </span>
-            </div>
+          <div className="ar-invoice-card__erp-zone">
+            {renderInvoiceERPAction()}
           </div>
         </div>
       </div>
