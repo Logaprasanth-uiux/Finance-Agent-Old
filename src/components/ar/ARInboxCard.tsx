@@ -1,18 +1,20 @@
 import React from 'react';
-import type { ARPayment } from '../../types/ar';
+import type { ARPayment, PaymentAttachment } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
-import { CheckCircle2, Clock, AlertTriangle, FileCheck, Layers } from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, FileCheck, Layers, Paperclip } from 'lucide-react';
 
 interface ARInboxCardProps {
   payment: ARPayment;
   isSelected: boolean;
   onSelect: (payment: ARPayment) => void;
+  onOpenAttachment?: (attachment: PaymentAttachment) => void;
 }
 
 export const ARInboxCard: React.FC<ARInboxCardProps> = ({
   payment,
   isSelected,
   onSelect,
+  onOpenAttachment,
 }) => {
   const getStatusBadge = () => {
     switch (payment.status) {
@@ -92,6 +94,25 @@ export const ARInboxCard: React.FC<ARInboxCardProps> = ({
           Ref: {payment.paymentRef}
         </div>
       </div>
+
+      {/* Attachment Chip if available */}
+      {payment.attachment && (
+        <div className="ar-inbox-card__attach-row">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenAttachment?.(payment.attachment!);
+            }}
+            className="ar-inbox-card__attach-chip"
+            title={`View ${payment.attachment.name}`}
+          >
+            <Paperclip size={11} className="ar-inbox-card__attach-icon" />
+            <span className="ar-inbox-card__attach-text">PDF Attachment</span>
+            <span className="ar-inbox-card__attach-size">({payment.attachment.size})</span>
+          </button>
+        </div>
+      )}
 
       <div className="ar-inbox-card__footer">
         <div className="ar-inbox-card__invoices-count">

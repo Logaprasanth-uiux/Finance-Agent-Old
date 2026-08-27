@@ -19,6 +19,12 @@ export const initialARPayments: ARPayment[] = [
     erpStatus: 'Ready to Post',
     sapDoc: '—',
     notes: 'Auto-reconciled with single sales invoice INV-2026-00482 based on remittance advice and exact net settlement.',
+    attachment: {
+      name: 'Remittance_Advice_JPMC_CHASH000191.pdf',
+      size: '325 KB',
+      url: '/Doc/3bcb5573-f781-4cdb-b953-3bc11ea338aa.pdf',
+      type: 'pdf',
+    },
     matchedInvoices: [
       {
         id: 'inv-001',
@@ -93,6 +99,12 @@ export const initialARPayments: ARPayment[] = [
     sapDoc: '1400000269',
     postedAt: '29 Jun 2026, 16:30',
     notes: 'Successfully posted to SAP ERP financial ledger with document clearance code DZ.',
+    attachment: {
+      name: 'Payment_Advice_TechCorp_HDFC98234.pdf',
+      size: '344 KB',
+      url: '/Doc/3e5e14d5-69ca-482f-90ba-e0aa39960a05.pdf',
+      type: 'pdf',
+    },
     matchedInvoices: [
       {
         id: 'inv-002',
@@ -157,6 +169,12 @@ export const initialARPayments: ARPayment[] = [
     erpStatus: 'Pending Match',
     sapDoc: '—',
     notes: 'Excess balance of ₹2,80,000 received. Pending customer TDS adjustment certificate or allocation to on-account advance.',
+    attachment: {
+      name: 'Acme_CMS_Settlement_Advice.pdf',
+      size: '325 KB',
+      url: '/Doc/3bcb5573-f781-4cdb-b953-3bc11ea338aa.pdf',
+      type: 'pdf',
+    },
     matchedInvoices: [
       {
         id: 'inv-003',
@@ -212,6 +230,12 @@ export const initialARPayments: ARPayment[] = [
     erpStatus: 'On Hold',
     sapDoc: '—',
     notes: 'No automated rule match executed due to missing document reference in remittance remarks. High AI confidence match suggested.',
+    attachment: {
+      name: 'Axis_Bank_Inbound_Remittance_Slip.pdf',
+      size: '344 KB',
+      url: '/Doc/3e5e14d5-69ca-482f-90ba-e0aa39960a05.pdf',
+      type: 'pdf',
+    },
     matchedInvoices: [],
     suggestedMatches: [
       {
@@ -276,6 +300,12 @@ export const initialARPayments: ARPayment[] = [
     erpStatus: 'Ready to Post',
     sapDoc: '—',
     notes: 'Multi-invoice split payment reconciled across North Zone Logistics and Warehouse Sorting milestones.',
+    attachment: {
+      name: 'GLS_RTGS_MultiInvoice_Remittance.pdf',
+      size: '325 KB',
+      url: '/Doc/3bcb5573-f781-4cdb-b953-3bc11ea338aa.pdf',
+      type: 'pdf',
+    },
     matchedInvoices: [
       {
         id: 'inv-005-a',
@@ -366,6 +396,12 @@ export const initialARPayments: ARPayment[] = [
     sapDoc: '1400000288',
     postedAt: '25 Jun 2026, 19:12',
     notes: 'Batch reconciled and posted to SAP document #1400000288 with zero balance discrepancy.',
+    attachment: {
+      name: 'SBI_DirectCredit_Posting_Memo.pdf',
+      size: '344 KB',
+      url: '/Doc/3e5e14d5-69ca-482f-90ba-e0aa39960a05.pdf',
+      type: 'pdf',
+    },
     matchedInvoices: [
       {
         id: 'inv-006',

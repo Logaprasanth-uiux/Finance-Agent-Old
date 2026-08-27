@@ -50,6 +50,13 @@ export interface SuggestedInvoiceMatch {
   matchReasons: string[];
 }
 
+export interface PaymentAttachment {
+  name: string;
+  size: string;
+  url: string;
+  type: 'pdf';
+}
+
 export interface ARPayment {
   id: string;
   sender: string;
@@ -71,4 +78,5 @@ export interface ARPayment {
   matchedInvoices: MatchedInvoice[];
   suggestedMatches?: SuggestedInvoiceMatch[];
   notes?: string;
+  attachment?: PaymentAttachment;
 }

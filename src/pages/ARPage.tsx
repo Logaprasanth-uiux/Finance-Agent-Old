@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import type { ARPayment, SuggestedInvoiceMatch } from '../types/ar';
+import type { ARPayment, SuggestedInvoiceMatch, PaymentAttachment } from '../types/ar';
 import { initialARPayments } from '../data/arMockData';
 import ARInbox from '../components/ar/ARInbox';
 import ARWorkspace from '../components/ar/ARWorkspace';
-import { RotateCcw } from 'lucide-react';
+import ARPdfViewerModal from '../components/ar/ARPdfViewerModal';
 
 export const ARPage: React.FC = () => {
   const [payments, setPayments] = useState<ARPayment[]>(initialARPayments);
-  const [selectedPaymentId, setSelectedPaymentId] = useState<string>(
-    initialARPayments[0]?.id || ''
-  );
+  // Initial state: Inbox only (no payment selected initially)
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string>('');
   const [isPosting, setIsPosting] = useState<boolean>(false);
+  const [viewingAttachment, setViewingAttachment] = useState<PaymentAttachment | null>(null);
 
   const selectedPayment = payments.find((p) => p.id === selectedPaymentId) || null;
 
@@ -95,32 +95,8 @@ export const ARPage: React.FC = () => {
     );
   };
 
-  // Reset demo state
-  const handleResetDemoData = () => {
-    setPayments(initialARPayments);
-    setSelectedPaymentId(initialARPayments[0]?.id || '');
-  };
-
   return (
     <div className="ar-page-container">
-      {/* Quick Demo Toolbar banner */}
-      <div className="ar-demo-toolbar">
-        <div className="ar-demo-toolbar__info">
-          <span className="ar-demo-badge">DEMO WORKSPACE</span>
-          <span className="ar-demo-toolbar__text">
-            Interactive AR payment reconciliation & SAP ERP posting experience
-          </span>
-        </div>
-        <button
-          onClick={handleResetDemoData}
-          className="ar-demo-toolbar__reset-btn"
-          title="Reset mock data to initial demo state"
-        >
-          <RotateCcw size={13} />
-          Reset Demo Data
-        </button>
-      </div>
-
       {/* Two-Pane Primary Workspace */}
       <div className="ar-two-pane-layout">
         {/* Left Pane: Inbox */}
@@ -128,6 +104,7 @@ export const ARPage: React.FC = () => {
           payments={payments}
           selectedPaymentId={selectedPaymentId}
           onSelectPayment={(payment) => setSelectedPaymentId(payment.id)}
+          onOpenAttachment={setViewingAttachment}
         />
 
         {/* Right Pane: Workspace & Reconciliation Details */}
@@ -136,8 +113,15 @@ export const ARPage: React.FC = () => {
           onPostToERP={handlePostToERP}
           onAcceptMatch={handleAcceptMatch}
           isPosting={isPosting}
+          onOpenAttachment={setViewingAttachment}
         />
       </div>
+
+      {/* PDF Viewer Modal Overlay */}
+      <ARPdfViewerModal
+        attachment={viewingAttachment}
+        onClose={() => setViewingAttachment(null)}
+      />
     </div>
   );
 };

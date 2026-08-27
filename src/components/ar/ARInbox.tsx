@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { ARPayment, ReconciliationStatus } from '../../types/ar';
+import type { ARPayment, ReconciliationStatus, PaymentAttachment } from '../../types/ar';
 import ARInboxCard from './ARInboxCard';
 import { Search, SlidersHorizontal, Inbox } from 'lucide-react';
 
@@ -7,6 +7,7 @@ interface ARInboxProps {
   payments: ARPayment[];
   selectedPaymentId: string;
   onSelectPayment: (payment: ARPayment) => void;
+  onOpenAttachment?: (attachment: PaymentAttachment) => void;
 }
 
 type FilterTab = 'ALL' | ReconciliationStatus;
@@ -15,6 +16,7 @@ export const ARInbox: React.FC<ARInboxProps> = ({
   payments,
   selectedPaymentId,
   onSelectPayment,
+  onOpenAttachment,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterTab>('ALL');
@@ -137,6 +139,7 @@ export const ARInbox: React.FC<ARInboxProps> = ({
               payment={payment}
               isSelected={payment.id === selectedPaymentId}
               onSelect={onSelectPayment}
+              onOpenAttachment={onOpenAttachment}
             />
           ))
         )}

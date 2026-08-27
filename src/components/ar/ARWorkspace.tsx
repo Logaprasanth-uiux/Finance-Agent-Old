@@ -1,10 +1,10 @@
 import React from 'react';
-import type { ARPayment, SuggestedInvoiceMatch } from '../../types/ar';
+import type { ARPayment, SuggestedInvoiceMatch, PaymentAttachment } from '../../types/ar';
 import ARPaymentHeader from './ARPaymentHeader';
 import ARReconciliationSummary from './ARReconciliationSummary';
 import ARInvoiceCard from './ARInvoiceCard';
 import ARSuggestedMatches from './ARSuggestedMatches';
-import { Layers, FileText, Info, HelpCircle } from 'lucide-react';
+import { Layers, Info, HelpCircle } from 'lucide-react';
 import { formatCurrencyINR } from '../../data/arMockData';
 
 interface ARWorkspaceProps {
@@ -12,6 +12,7 @@ interface ARWorkspaceProps {
   onPostToERP: (paymentId: string) => void;
   onAcceptMatch: (paymentId: string, suggestion: SuggestedInvoiceMatch) => void;
   isPosting: boolean;
+  onOpenAttachment?: (attachment: PaymentAttachment) => void;
 }
 
 export const ARWorkspace: React.FC<ARWorkspaceProps> = ({
@@ -19,13 +20,14 @@ export const ARWorkspace: React.FC<ARWorkspaceProps> = ({
   onPostToERP,
   onAcceptMatch,
   isPosting,
+  onOpenAttachment,
 }) => {
   if (!payment) {
     return (
-      <div className="ar-workspace-empty">
-        <FileText size={40} className="ar-workspace-empty__icon" />
-        <h3>No Payment Selected</h3>
-        <p>Please select an incoming payment from the inbox on the left to view reconciliation details.</p>
+      <div className="ar-workspace-placeholder">
+        <p className="ar-workspace-placeholder__text">
+          Select an inbox item to view details
+        </p>
       </div>
     );
   }
@@ -40,6 +42,7 @@ export const ARWorkspace: React.FC<ARWorkspaceProps> = ({
         payment={payment}
         onPostToERP={onPostToERP}
         isPosting={isPosting}
+        onOpenAttachment={onOpenAttachment}
       />
 
       {/* 2. Prominent Reconciliation Summary */}
