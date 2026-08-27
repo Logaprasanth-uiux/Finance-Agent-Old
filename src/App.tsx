@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import PlaceholderPage from './components/PlaceholderPage';
 import SchemaPage from './pages/SchemaPage';
+import ARPage from './pages/ARPage';
 import { navigationConfig } from './config/navigation';
 
 function App() {
@@ -24,6 +25,17 @@ function App() {
                   key={item.path}
                   path={relativePath}
                   element={<SchemaPage />}
+                />
+              );
+            }
+
+            // Render AR page component for /ar
+            if (relativePath === 'ar') {
+              return (
+                <Route
+                  key={item.path}
+                  path={relativePath}
+                  element={<ARPage />}
                 />
               );
             }
