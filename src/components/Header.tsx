@@ -4,10 +4,22 @@ import { navigationConfig } from '../config/navigation';
 
 export const Header = () => {
   const location = useLocation();
-  
-  // Find current label based on path
-  const currentItem = navigationConfig.find(item => item.path === location.pathname);
-  const pageTitle = currentItem ? currentItem.label : 'Dashboard';
+
+  // Find current label based on path (including nested submenus)
+  let pageTitle = 'Dashboard';
+  for (const item of navigationConfig) {
+    if (item.path === location.pathname) {
+      pageTitle = item.label;
+      break;
+    }
+    if (item.children) {
+      const sub = item.children.find((c) => c.path === location.pathname);
+      if (sub) {
+        pageTitle = sub.label;
+        break;
+      }
+    }
+  }
 
   return (
     <header className="header">

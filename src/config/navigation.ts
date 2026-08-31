@@ -1,14 +1,36 @@
+export interface NavigationSubItem {
+  path: string;
+  label: string;
+}
+
 export interface NavigationItem {
   path: string;
   label: string;
   iconName: string;
   hasChevron?: boolean;
+  children?: NavigationSubItem[];
 }
 
 export const navigationConfig: NavigationItem[] = [
   { path: '/dashboard', label: 'Dashboard', iconName: 'LayoutDashboard' },
   { path: '/inbox', label: 'Inbox', iconName: 'Inbox' },
-  { path: '/transact', label: 'Transact', iconName: 'CreditCard' },
+  {
+    path: '/transact',
+    label: 'Transact',
+    iconName: 'CreditCard',
+    hasChevron: true,
+    children: [
+      { path: '/transact/bill-invoice', label: 'Bill/Invoice' },
+      { path: '/transact/cost-allocation', label: 'Cost Allocation' },
+      { path: '/transact/goods-and-service', label: 'Goods and Service' },
+      { path: '/transact/intern-plan', label: 'Intern Plan' },
+      { path: '/transact/item', label: 'Item' },
+      { path: '/transact/organization', label: 'Organization' },
+      { path: '/transact/purchase-order', label: 'Purchase Order' },
+      { path: '/transact/rfq', label: 'RFQ' },
+      { path: '/transact/vendor', label: 'Vendor' },
+    ],
+  },
   { path: '/approvals', label: 'Approvals', iconName: 'FileCheck', hasChevron: true },
   { path: '/integration', label: 'Integration', iconName: 'Network' },
   { path: '/ledger-view', label: 'Ledger View', iconName: 'FileText' },
