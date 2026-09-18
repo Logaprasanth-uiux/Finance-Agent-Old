@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import type { MatchedInvoice } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
@@ -244,3 +245,4 @@ export const ARInvoiceCard: React.FC<ARInvoiceCardProps> = ({
 };
 
 export default ARInvoiceCard;
+

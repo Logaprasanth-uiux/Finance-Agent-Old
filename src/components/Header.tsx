@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, Search, ChevronDown, Store, FileText, RefreshCw, Building2, LogOut, Layers } from 'lucide-react';
 import { navigationConfig } from '../config/navigation';
@@ -83,8 +83,15 @@ export const Header = () => {
           <ChevronDown size={12} className="header-org-chevron" />
         </button>
 
-        <button className="utility-btn" aria-label="Marketplace">
-          <Store size={20} />
+        {/* Vendor Portal Entry Button */}
+        <button
+          type="button"
+          onClick={() => navigate('/vendor-portal')}
+          className="header-vendor-btn"
+          title="Open Vendor Portal"
+        >
+          <Store size={15} className="header-vendor-icon" />
+          <span className="header-vendor-name">Vendor Portal</span>
         </button>
         <button className="utility-btn" aria-label="Documents">
           <FileText size={20} />
@@ -150,4 +157,3 @@ export const Header = () => {
 };
 
 export default Header;
-

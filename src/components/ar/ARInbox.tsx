@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useMemo } from 'react';
 import type { ARPayment, ReconciliationStatus, PaymentAttachment } from '../../types/ar';
 import ARInboxCard from './ARInboxCard';
@@ -149,3 +150,4 @@ export const ARInbox: React.FC<ARInboxProps> = ({
 };
 
 export default ARInbox;
+

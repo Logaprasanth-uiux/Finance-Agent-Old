@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from 'react';
 import type { PaymentAttachment } from '../../types/ar';
 import { X, FileText, ExternalLink, Download } from 'lucide-react';
@@ -90,3 +91,4 @@ export const ARPdfViewerModal: React.FC<ARPdfViewerModalProps> = ({
 };
 
 export default ARPdfViewerModal;
+

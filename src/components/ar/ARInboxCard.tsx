@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import type { ARPayment, PaymentAttachment } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
@@ -96,3 +97,4 @@ export const ARInboxCard: React.FC<ARInboxCardProps> = ({
 };
 
 export default ARInboxCard;
+

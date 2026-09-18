@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Check, X } from 'lucide-react';
 import {
   DndContext,
@@ -347,3 +347,5 @@ export const SchemaPage: React.FC = () => {
 };
 
 export default SchemaPage;
+
+

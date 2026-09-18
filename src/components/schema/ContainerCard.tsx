@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Plus, Check, X, Pencil, GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -294,3 +295,4 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({
 };
 
 export default ContainerCard;
+

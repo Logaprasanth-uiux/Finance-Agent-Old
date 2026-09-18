@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import type { ARPayment, SuggestedInvoiceMatch, PaymentAttachment } from '../../types/ar';
 import ARPaymentHeader from './ARPaymentHeader';
@@ -108,3 +109,4 @@ export const ARWorkspace: React.FC<ARWorkspaceProps> = ({
 };
 
 export default ARWorkspace;
+

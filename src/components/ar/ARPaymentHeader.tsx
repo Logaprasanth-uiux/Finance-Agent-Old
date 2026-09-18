@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import type { ARPayment, PaymentAttachment } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
@@ -240,3 +241,4 @@ export const ARPaymentHeader: React.FC<ARPaymentHeaderProps> = ({
 };
 
 export default ARPaymentHeader;
+

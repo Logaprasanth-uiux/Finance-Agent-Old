@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import type { ARPayment } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
@@ -159,3 +160,4 @@ export const ARReconciliationSummary: React.FC<ARReconciliationSummaryProps> = (
 };
 
 export default ARReconciliationSummary;
+

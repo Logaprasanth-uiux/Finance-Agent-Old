@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import type { LinkedRecord } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
@@ -92,3 +93,4 @@ export const ARLinkedRecords: React.FC<ARLinkedRecordsProps> = ({ records }) => 
 };
 
 export default ARLinkedRecords;
+

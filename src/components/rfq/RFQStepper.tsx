@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { Package, Cpu, Users, Send, Check, ArrowRight, ArrowLeft, RefreshCw } from 'lucide-react';
 
@@ -170,3 +171,4 @@ export const RFQStepper: React.FC<RFQStepperProps> = ({
 };
 
 export default RFQStepper;
+

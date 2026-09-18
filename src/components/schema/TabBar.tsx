@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Check, X, ChevronLeft, ChevronRight, Pencil, Menu } from 'lucide-react';
 
@@ -327,3 +328,4 @@ export const TabBar: React.FC<TabBarProps> = ({
 };
 
 export default TabBar;
+

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { Pencil, Check, X } from 'lucide-react';
 
@@ -116,3 +117,4 @@ export const FieldRow: React.FC<FieldRowProps> = ({ id, name, value, onEditField
 };
 
 export default FieldRow;
+

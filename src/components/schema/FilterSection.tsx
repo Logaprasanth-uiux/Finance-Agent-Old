@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { Search } from 'lucide-react';
 
@@ -45,3 +46,4 @@ export const FilterSection: React.FC = () => {
 };
 
 export default FilterSection;
+

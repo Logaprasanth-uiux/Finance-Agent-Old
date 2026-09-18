@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useMemo } from 'react';
 import type { Vendor } from '../../types/rfq';
 import { mockVendors } from '../../data/rfqMockData';
@@ -72,6 +73,10 @@ export const RFQVendorsStep: React.FC<RFQVendorsStepProps> = ({
 
   return (
     <div className="rfq-step-layout">
+      {/* Clean Step Heading */}
+      <div className="rfq-step-heading-row">
+        <h2 className="rfq-step-main-title">Step 3: Supplier &amp; Vendor Selection</h2>
+      </div>
       {/* Selected Vendors Bar */}
       <div className="rfq-vendors-summary-bar">
         <div className="rfq-vendors-summary-bar__left">
@@ -274,3 +279,4 @@ export const RFQVendorsStep: React.FC<RFQVendorsStepProps> = ({
 };
 
 export default RFQVendorsStep;
+

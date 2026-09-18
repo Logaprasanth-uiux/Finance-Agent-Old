@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Check, X, Pencil } from 'lucide-react';
 
@@ -184,3 +185,4 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
 };
 
 export default JsonNode;
+

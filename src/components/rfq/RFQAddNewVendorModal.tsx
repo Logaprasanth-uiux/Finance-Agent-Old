@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { UserPlus, ArrowRight, X, ShieldCheck } from 'lucide-react';
 
@@ -90,3 +91,4 @@ export const RFQAddNewVendorModal: React.FC<RFQAddNewVendorModalProps> = ({
 };
 
 export default RFQAddNewVendorModal;
+

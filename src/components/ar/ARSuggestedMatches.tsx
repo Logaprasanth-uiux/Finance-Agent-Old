@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import type { SuggestedInvoiceMatch, ARPayment } from '../../types/ar';
 import { formatCurrencyINR } from '../../data/arMockData';
@@ -106,3 +107,4 @@ export const ARSuggestedMatches: React.FC<ARSuggestedMatchesProps> = ({
 };
 
 export default ARSuggestedMatches;
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { navigationConfig } from '../config/navigation';
@@ -7,6 +7,7 @@ export const Sidebar = () => {
   const location = useLocation();
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({
     '/transact': true, // Default open for Transact so RFQ and sub-items are visible
+    '/ar': true, // Default open for AR so Inbox and Open Items are visible
   });
 
   const toggleSubmenu = (path: string, e: React.MouseEvent) => {
@@ -108,4 +109,3 @@ export const Sidebar = () => {
 };
 
 export default Sidebar;
-

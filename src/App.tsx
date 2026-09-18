@@ -5,10 +5,15 @@ import AppShell from './components/AppShell';
 import PlaceholderPage from './components/PlaceholderPage';
 import SchemaPage from './pages/SchemaPage';
 import ARPage from './pages/ARPage';
+import AROpenItemsPage from './pages/AROpenItemsPage';
 import RFQPage from './pages/RFQPage';
 import LoginPage from './pages/auth/LoginPage';
 import VerifyPage from './pages/auth/VerifyPage';
 import SelectOrgPage from './pages/auth/SelectOrgPage';
+import VendorPortalLayout from './pages/vendor-portal/VendorPortalLayout';
+import VendorPortalHomePage from './pages/vendor-portal/VendorPortalHomePage';
+import VendorRFQInboxPage from './pages/vendor-portal/VendorRFQInboxPage';
+import VendorRFQDetailPage from './pages/vendor-portal/VendorRFQDetailPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { navigationConfig } from './config/navigation';
 
@@ -44,7 +49,14 @@ function AppRoutes() {
       {/* Root Path: Redirects to /dashboard if authed, or /login */}
       <Route path="/" element={<RootRedirector />} />
 
-      {/* 2. Protected Application Shell Routes */}
+      {/* 2. Vendor Portal Routes */}
+      <Route path="/vendor-portal" element={<VendorPortalLayout />}>
+        <Route index element={<VendorPortalHomePage />} />
+        <Route path="rfq" element={<VendorRFQInboxPage />} />
+        <Route path="rfq/:rfqId" element={<VendorRFQDetailPage />} />
+      </Route>
+
+      {/* 3. Protected Application Shell Routes */}
       <Route
         element={
           <RequireAuth>
@@ -52,6 +64,30 @@ function AppRoutes() {
           </RequireAuth>
         }
       >
+        {/* Dashboard */}
+        <Route
+          path="dashboard"
+          element={
+            <PlaceholderPage
+              title="Dashboard"
+              description="Welcome to Agentic Finance enterprise dashboard."
+              iconName="LayoutDashboard"
+            />
+          }
+        />
+
+        {/* Inbox */}
+        <Route
+          path="inbox"
+          element={
+            <PlaceholderPage
+              title="Inbox"
+              description="This page will be implemented in the next phase."
+              iconName="Inbox"
+            />
+          }
+        />
+
         {/* Transact root redirect to /transact/rfq */}
         <Route path="transact" element={<Navigate to="/transact/rfq" replace />} />
         <Route path="transact/rfq" element={<RFQPage />} />
@@ -138,37 +174,30 @@ function AppRoutes() {
           }
         />
 
-        {/* Dynamic route mapping from config */}
-        {navigationConfig.map((item) => {
-          // Skip transact since it is explicitly routed above
-          if (item.path === '/transact') return null;
+        {/* Accounts Receivable (AR) Routes */}
+        <Route path="ar" element={<Navigate to="/ar/inbox" replace />} />
+        <Route path="ar/inbox" element={<ARPage />} />
+        <Route path="ar/open-items" element={<AROpenItemsPage />} />
 
-          // Remove leading slash for relative routing nested in AppShell
+        {/* Schema Explorer */}
+        <Route path="schema" element={<SchemaPage />} />
+
+        {/* Other navigation items */}
+        {navigationConfig.map((item) => {
+          // Skip transact, ar, schema, dashboard, inbox as they are explicitly routed above
+          if (
+            item.path === '/transact' ||
+            item.path === '/ar' ||
+            item.path === '/schema' ||
+            item.path === '/dashboard' ||
+            item.path === '/inbox'
+          ) {
+            return null;
+          }
+
           const relativePath = item.path.startsWith('/')
             ? item.path.substring(1)
             : item.path;
-
-          // Render specific Schema page component for /schema
-          if (relativePath === 'schema') {
-            return (
-              <Route
-                key={item.path}
-                path={relativePath}
-                element={<SchemaPage />}
-              />
-            );
-          }
-
-          // Render AR page component for /ar
-          if (relativePath === 'ar') {
-            return (
-              <Route
-                key={item.path}
-                path={relativePath}
-                element={<ARPage />}
-              />
-            );
-          }
 
           return (
             <Route

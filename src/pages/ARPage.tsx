@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import type { ARPayment, SuggestedInvoiceMatch, PaymentAttachment } from '../types/ar';
 import { initialARPayments } from '../data/arMockData';
 import ARInbox from '../components/ar/ARInbox';
@@ -127,3 +127,5 @@ export const ARPage: React.FC = () => {
 };
 
 export default ARPage;
+
+
